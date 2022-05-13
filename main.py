@@ -12,9 +12,10 @@ class Gui(tk.Tk):
         self.geometry("630x600+900+300")
         self.NUM_GUESSES = 6
         self.word_list = word_list
+        self.config(bg="#121213", padx=30, pady=30)
 
         self.board_frame = tk.Frame(self)
-        guess_frame = tk.Frame(self)
+        guess_frame = tk.Frame(self, bg="#121213")
         guess_frame.grid(row=1, column=0)
         self.guess_entry = tk.Entry(guess_frame, font="Helvetica 15")
         self.guess_entry.pack(side="left", padx=20, pady=20)
@@ -27,8 +28,13 @@ class Gui(tk.Tk):
         )
         new_word_button.pack(side="left")
 
-        self.word_label = ttk.Label(
-            self, width=10, anchor="center", font="Helvetica 30"
+        self.word_label = tk.Label(
+            self,
+            bg="#121213",
+            fg="#538D4E",
+            width=10,
+            anchor="center",
+            font="Helvetica 30",
         )
         self.word_label.grid()
 
@@ -37,7 +43,7 @@ class Gui(tk.Tk):
     def display_board(self):
         self.board_frame.destroy()
         self.board_frame = tk.Frame(self, background="#121213")
-        self.board_frame.grid(row=0, column=0, ipadx=50, ipady=20)
+        self.board_frame.grid(row=0, column=0)
 
         for row in self.board:
             row_frame = tk.Frame(self.board_frame, bg="#121213")
