@@ -5,13 +5,14 @@ from tkinter import ttk
 
 
 class Gui(tk.Tk):
-    def __init__(self, word):
+    def __init__(self, word_list):
         super().__init__()
 
         self.NUM_GUESSES = 6
         self.guess_number = 0
-        self.word = word
-        self.guess = ""
+        self.word_list = word_list
+        self.word = choice(word_list).upper()
+        print(self.word)
 
         self.title("Wordle Clone")
         self.geometry("630x450+900+300")
@@ -28,7 +29,9 @@ class Gui(tk.Tk):
             guess_frame, text="Guess", width=15, command=self.make_guess
         )
         self.guess_button.pack(side="left", padx=[0, 20])
-        self.new_word_button = ttk.Button(guess_frame, text="New Word", width=15)
+        self.new_word_button = ttk.Button(
+            guess_frame, text="New Word", width=15, command=self.on_new_word
+        )
         self.new_word_button.pack(side="left")
 
     def display_board(self):
@@ -78,13 +81,17 @@ class Gui(tk.Tk):
     def on_lose(self):
         print("Lost")
 
+    def on_new_word(self):
+        print("New Word")
+        self.random_word()
+
+    def random_word(self):
+        print(word_list)
+
 
 if __name__ == "__main__":
     with open("word_list.pkl", "rb") as open_file:
-        data = pickle.load(open_file)
+        word_list = pickle.load(open_file)
 
-    word = choice(data).upper()
-    print(word)
-
-    gui = Gui(word)
+    gui = Gui(word_list)
     gui.mainloop()
