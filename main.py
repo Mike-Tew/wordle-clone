@@ -8,15 +8,15 @@ class Gui(tk.Tk):
     def __init__(self, word):
         super().__init__()
 
-        self.word = word
         self.NUM_GUESSES = 6
         self.guess_number = 0
+        self.word = word
+        self.guess = ""
 
         self.title("Wordle Clone")
         self.geometry("630x450+900+300")
 
         self.board = [["__" for _ in range(5)] for _ in range(self.NUM_GUESSES)]
-        print(self.board)
         self.board_frame = ttk.LabelFrame(self)
         self.display_board()
 
@@ -25,9 +25,11 @@ class Gui(tk.Tk):
         self.guess_entry = tk.Entry(guess_frame, font="Helvetica 15")
         self.guess_entry.pack(side="left", padx=20, pady=20)
         self.guess_button = ttk.Button(
-            guess_frame, text="Guess", width=20, command=self.make_guess
+            guess_frame, text="Guess", width=15, command=self.make_guess
         )
-        self.guess_button.pack(side="right", padx=[0, 20])
+        self.guess_button.pack(side="left", padx=[0, 20])
+        self.new_word_button = ttk.Button(guess_frame, text="New Word", width=15)
+        self.new_word_button.pack(side="left")
 
     def display_board(self):
         self.board_frame.destroy()
@@ -39,7 +41,6 @@ class Gui(tk.Tk):
             row_frame.pack()
             for char in zip(row, self.word):
                 color = self.get_color(char)
-                # print(char, char[0] == char[1])
                 ttk.Label(
                     row_frame,
                     text=char[0],
@@ -58,11 +59,24 @@ class Gui(tk.Tk):
             return "black"
 
     def make_guess(self):
-        guess = list(self.guess_entry.get().upper())
-        print(guess)
-        self.board[self.guess_number] = guess
+        guess = self.guess_entry.get().upper()
+        if not guess.isalpha() or len(guess) != 5:
+            return
+
+        self.board[self.guess_number] = list(guess)
         self.guess_number += 1
         self.display_board()
+
+        if guess == self.word:
+            self.on_win()
+        elif self.guess_number >= self.NUM_GUESSES:
+            self.on_lose()
+
+    def on_win(self):
+        print("Victory")
+
+    def on_lose(self):
+        print("Lost")
 
 
 if __name__ == "__main__":
