@@ -1,17 +1,20 @@
-import pickle
 import tkinter as tk
 from random import choice
 from tkinter import ttk
 
+from all_words import all_words
+from word_list import word_list
+
 
 class Gui(tk.Tk):
-    def __init__(self, word_list):
+    def __init__(self, word_list, all_words):
         super().__init__()
 
         self.title("Wordle Clone")
         self.geometry("630x600+900+300")
         self.NUM_GUESSES = 6
         self.word_list = word_list
+        self.all_words = all_words
         self.config(bg="#121213", padx=30, pady=30)
 
         self.board_frame = tk.Frame(self)
@@ -77,7 +80,7 @@ class Gui(tk.Tk):
 
     def make_guess(self):
         guess = self.guess_entry.get().upper()
-        if not guess.isalpha() or len(guess) != 5:
+        if guess.lower() not in self.all_words:
             return
 
         self.board[self.guess_number] = list(guess)
@@ -103,15 +106,12 @@ class Gui(tk.Tk):
         self.guess_button.config(state="normal")
         self.word_label.config(text="")
         self.guess_number = 0
-        self.word = choice(word_list).upper()
+        self.word = choice(self.word_list).upper()
         self.board = [[" " for _ in range(5)] for _ in range(self.NUM_GUESSES)]
         self.display_board()
         print(self.word)
 
 
 if __name__ == "__main__":
-    with open("word_list.pkl", "rb") as open_file:
-        word_list = pickle.load(open_file)
-
-    gui = Gui(word_list)
+    gui = Gui(word_list, all_words)
     gui.mainloop()
