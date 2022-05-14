@@ -11,7 +11,7 @@ class Gui(tk.Tk):
         super().__init__()
 
         self.title("Wordle Clone")
-        self.geometry("630x600+900+300")
+        self.geometry("630x600+900+200")
         self.NUM_GUESSES = 6
         self.word_list = word_list
         self.all_words = all_words
@@ -41,6 +41,13 @@ class Gui(tk.Tk):
         )
         self.word_label.grid()
 
+        self.keyboard_frame = ttk.Frame(self, width=10)
+        self.keyboard_frame.grid(row=2, column=0)
+
+        self.green_keys = []
+        self.yellow_keys = []
+        self.black_keys = []
+
         self.game_setup()
 
     def display_board(self):
@@ -69,9 +76,12 @@ class Gui(tk.Tk):
                 border_color.config(bg=color)
 
     def get_color(self, char):
+        self.black_keys.append(char[0])
         if char[0] == char[1]:
+            self.green_keys.append(char[0])
             return "#538D4E"
         elif char[0] in self.word:
+            self.yellow_keys.append(char[0])
             return "#B59F3B"
         elif char[0] == " ":
             return "#121213"
@@ -86,6 +96,14 @@ class Gui(tk.Tk):
         self.board[self.guess_number] = list(guess)
         self.guess_number += 1
         self.display_board()
+
+        for key in self.key_buttons:
+            if key["text"] in self.green_keys:
+                key.config(bg="green")
+            elif key["text"] in self.yellow_keys:
+                key.config(bg="yellow")
+            elif key["text"] in self.black_keys:
+                key.config(bg="black")
 
         if guess == self.word:
             self.on_win()
@@ -109,7 +127,51 @@ class Gui(tk.Tk):
         self.word = choice(self.word_list).upper()
         self.board = [[" " for _ in range(5)] for _ in range(self.NUM_GUESSES)]
         self.display_board()
+
+        keys = [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+        ]
+        self.key_buttons = [self.create_key(key) for key in keys]
+
         print(self.word)
+
+    def create_key(self, key):
+        key_button = tk.Button(
+            self.keyboard_frame,
+            text=key,
+            font="Helvetica 10",
+            command=lambda: self.send_keypress(key),
+        )
+        key_button.pack(side="left")
+        return key_button
+
+    def send_keypress(self, key):
+        self.guess_entry.insert(tk.END, key)
 
 
 if __name__ == "__main__":
