@@ -1,4 +1,5 @@
 import tkinter as tk
+from ctypes import sizeof
 from random import choice
 from tkinter import ttk
 
@@ -11,7 +12,7 @@ class Gui(tk.Tk):
         super().__init__()
 
         self.title("Wordle Clone")
-        self.geometry("630x600+900+200")
+        self.geometry("+900+200")
         self.NUM_GUESSES = 6
         self.word_list = word_list
         self.all_words = all_words
@@ -41,9 +42,7 @@ class Gui(tk.Tk):
         )
         self.word_label.grid()
 
-        self.keyboard_frame = ttk.Frame(self, width=10)
-        self.keyboard_frame.grid(row=2, column=0)
-
+        self.keyboard_frame = ttk.Frame(self)
         self.green_keys = []
         self.yellow_keys = []
         self.black_keys = []
@@ -70,7 +69,7 @@ class Gui(tk.Tk):
                     background=color,
                     font="Courier 30 bold",
                     anchor="center",
-                ).pack(ipadx=20, padx=3, pady=3)
+                ).pack(ipadx=10, padx=3, pady=3)
 
                 color = "#3A3A3C" if char[0] == " " else color
                 border_color.config(bg=color)
@@ -99,11 +98,11 @@ class Gui(tk.Tk):
 
         for key in self.key_buttons:
             if key["text"] in self.green_keys:
-                key.config(bg="green")
+                key.config(bg="#538D4E")
             elif key["text"] in self.yellow_keys:
-                key.config(bg="yellow")
+                key.config(bg="#B59F3B")
             elif key["text"] in self.black_keys:
-                key.config(bg="black")
+                key.config(bg="#3A3A3C")
 
         if guess == self.word:
             self.on_win()
@@ -129,45 +128,67 @@ class Gui(tk.Tk):
         self.display_board()
 
         keys = [
-            "A",
-            "B",
-            "C",
-            "D",
+            "Q",
+            "W",
             "E",
+            "R",
+            "T",
+            "Y",
+            "U",
+            "I",
+            "O",
+            "P",
+            "A",
+            "S",
+            "D",
             "F",
             "G",
             "H",
-            "I",
             "J",
             "K",
             "L",
-            "M",
-            "N",
-            "O",
-            "P",
-            "Q",
-            "R",
-            "S",
-            "T",
-            "U",
-            "V",
-            "W",
-            "X",
-            "Y",
+            "ENT",
             "Z",
+            "X",
+            "C",
+            "V",
+            "B",
+            "N",
+            "M",
+            "BK",
         ]
+        self.green_keys = []
+        self.yellow_keys = []
+        self.black_keys = []
+        self.keyboard_frame = tk.Frame(self, width=10, bg="#121213")
+        self.keyboard_frame.grid(row=2, column=0)
+        self.key_row_1 = tk.Frame(self.keyboard_frame, bg="#121213")
+        self.key_row_1.pack()
+        self.key_row_2 = tk.Frame(self.keyboard_frame, bg="#121213")
+        self.key_row_2.pack()
+        self.key_row_3 = tk.Frame(self.keyboard_frame, bg="#121213")
+        self.key_row_3.pack()
+
         self.key_buttons = [self.create_key(key) for key in keys]
 
         print(self.word)
 
     def create_key(self, key):
+        frame = self.key_row_3
+        if key in "QWERTYUIOP":
+            frame = self.key_row_1
+        elif key in "ASDFGHJKL":
+            frame = self.key_row_2
+
         key_button = tk.Button(
-            self.keyboard_frame,
+            frame,
             text=key,
-            font="Helvetica 10",
+            font="Helvetica 12",
+            fg="#FFFFFF",
+            bg="#818384",
             command=lambda: self.send_keypress(key),
         )
-        key_button.pack(side="left")
+        key_button.pack(side="left", padx=3, pady=3, ipadx=7, ipady=7)
         return key_button
 
     def send_keypress(self, key):
