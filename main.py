@@ -1,7 +1,7 @@
 import tkinter as tk
-from ctypes import sizeof
 from random import choice
 from tkinter import ttk
+from turtle import width
 
 from all_words import all_words
 from word_list import word_list
@@ -12,7 +12,7 @@ class Gui(tk.Tk):
         super().__init__()
 
         self.title("Wordle Clone")
-        self.geometry("+900+200")
+        self.geometry("560x700+900+200")
         self.NUM_GUESSES = 6
         self.word_list = word_list
         self.all_words = all_words
@@ -21,9 +21,17 @@ class Gui(tk.Tk):
         self.board_frame = tk.Frame(self)
         guess_frame = tk.Frame(self, bg="#121213")
         guess_frame.grid(row=1, column=0)
-        self.guess_entry = tk.Entry(guess_frame, font="Helvetica 15")
+
+        vcmd = (self.register(self.validate), "%P")
+        self.guess_entry = tk.Entry(
+            guess_frame,
+            width=6,
+            font="Helvetica 15",
+            validate="key",
+            validatecommand=vcmd,
+        )
         self.guess_entry.pack(side="left", padx=20, pady=20)
-        self.guess_button = ttk.Button(
+        self.guess_button = tk.Button(
             guess_frame, text="Guess", width=15, command=self.make_guess
         )
         self.guess_button.pack(side="left", padx=[0, 20])
@@ -48,6 +56,15 @@ class Gui(tk.Tk):
         self.black_keys = []
 
         self.game_setup()
+
+    def validate(self, value):
+        if value.lower() in self.all_words:
+            self.guess_button.config(bg="#538D4E", state="normal")
+            return True
+        if len(value) <= 5:
+            self.guess_button.config(bg="SystemButtonFace", state="disabled")
+            return True
+        return False
 
     def display_board(self):
         self.board_frame.destroy()
@@ -89,8 +106,7 @@ class Gui(tk.Tk):
 
     def make_guess(self):
         guess = self.guess_entry.get().upper()
-        if guess.lower() not in self.all_words:
-            return
+        self.guess_entry.delete(0, "end")
 
         self.board[self.guess_number] = list(guess)
         self.guess_number += 1
@@ -120,7 +136,7 @@ class Gui(tk.Tk):
         self.word_label.config(text=self.word)
 
     def game_setup(self):
-        self.guess_button.config(state="normal")
+        self.guess_button.config(state="disabled")
         self.word_label.config(text="")
         self.guess_number = 0
         self.word = choice(self.word_list).upper()
@@ -183,7 +199,7 @@ class Gui(tk.Tk):
         key_button = tk.Button(
             frame,
             text=key,
-            font="Helvetica 12",
+            font="Courier 12",
             fg="#FFFFFF",
             bg="#818384",
             command=lambda: self.send_keypress(key),
@@ -192,6 +208,12 @@ class Gui(tk.Tk):
         return key_button
 
     def send_keypress(self, key):
+        if key == "ENT":
+            self.make_guess()
+            return
+        if key == "BK":
+            self.guess_entry.delete(1, 3)
+            return
         self.guess_entry.insert(tk.END, key)
 
 
