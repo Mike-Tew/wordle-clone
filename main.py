@@ -12,7 +12,7 @@ class Gui(tk.Tk):
         super().__init__()
 
         self.title("Wordle Clone")
-        self.geometry("560x700+900+200")
+        self.geometry("500x670+900+200")
         self.NUM_GUESSES = 6
         self.word_list = word_list
         self.all_words = all_words
@@ -26,29 +26,25 @@ class Gui(tk.Tk):
         self.guess_entry = tk.Entry(
             guess_frame,
             width=6,
-            font="Helvetica 15",
+            font="Courier 20 bold",
             validate="key",
             validatecommand=vcmd,
         )
         self.guess_entry.pack(side="left", padx=20, pady=20)
         self.guess_button = tk.Button(
-            guess_frame, text="Guess", width=15, command=self.make_guess
+            guess_frame,
+            text="Guess",
+            font="Helvetica 12 bold",
+            width=10,
+            command=self.make_guess,
         )
         self.guess_button.pack(side="left", padx=[0, 20])
+        self.bind("<Return>", lambda x=None: self.guess_button.invoke())
+
         new_word_button = ttk.Button(
-            guess_frame, text="New Word", width=15, command=self.game_setup
+            guess_frame, text="New Word", width=10, command=self.game_setup
         )
         new_word_button.pack(side="left")
-
-        self.word_label = tk.Label(
-            self,
-            bg="#121213",
-            fg="#538D4E",
-            width=10,
-            anchor="center",
-            font="Helvetica 30",
-        )
-        self.word_label.grid()
 
         self.keyboard_frame = ttk.Frame(self)
         self.green_keys = []
@@ -105,6 +101,9 @@ class Gui(tk.Tk):
             return "#3A3A3C"
 
     def make_guess(self):
+        if not self.validate:
+            return
+
         guess = self.guess_entry.get().upper()
         self.guess_entry.delete(0, "end")
 
@@ -120,24 +119,25 @@ class Gui(tk.Tk):
             elif key["text"] in self.black_keys:
                 key.config(bg="#3A3A3C")
 
-        if guess == self.word:
-            self.on_win()
-        elif self.guess_number >= self.NUM_GUESSES:
-            self.on_lose()
+        if guess == self.word or self.guess_number >= self.NUM_GUESSES:
+            self.game_end()
 
-    def on_win(self):
-        print("Victory")
-        self.guess_button.config(state="disabled")
-        self.word_label.config(text=self.word)
-
-    def on_lose(self):
-        print("Lost")
-        self.guess_button.config(state="disabled")
+    def game_end(self):
+        self.word_label = tk.Label(
+            self,
+            bg="#1A1A1A",
+            fg="#FFFFFF",
+            width=12,
+            anchor="center",
+            font="Helvetica 30",
+            pady=20,
+        )
+        self.word_label.place(x=85, y=20)
         self.word_label.config(text=self.word)
 
     def game_setup(self):
+        self.guess_entry.focus()
         self.guess_button.config(state="disabled")
-        self.word_label.config(text="")
         self.guess_number = 0
         self.word = choice(self.word_list).upper()
         self.board = [[" " for _ in range(5)] for _ in range(self.NUM_GUESSES)]
@@ -171,7 +171,7 @@ class Gui(tk.Tk):
             "B",
             "N",
             "M",
-            "BK",
+            "<-",
         ]
         self.green_keys = []
         self.yellow_keys = []
@@ -203,16 +203,18 @@ class Gui(tk.Tk):
             fg="#FFFFFF",
             bg="#818384",
             command=lambda: self.send_keypress(key),
+            takefocus=0,
         )
         key_button.pack(side="left", padx=3, pady=3, ipadx=7, ipady=7)
         return key_button
 
     def send_keypress(self, key):
+        print(key)
         if key == "ENT":
-            self.make_guess()
+            self.guess_button.invoke()
             return
-        if key == "BK":
-            self.guess_entry.delete(1, 3)
+        if key == "<-":
+            self.guess_entry.delete(self.guess_entry.index("end") - 1)
             return
         self.guess_entry.insert(tk.END, key)
 
